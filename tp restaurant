@@ -1,1 +1,171 @@
+import java.util.*;
+
+public class RestaurantMenu {
+
+    static Scanner input = new Scanner(System.in);
+    static Map<String, Integer> order = new LinkedHashMap<>();
+
+    public static void main(String[] args) {
+
+        while (true) {
+            System.out.println("===== MAIN MENU =====");
+            System.out.println("1. Menu");
+            System.out.println("2. Show Total");
+            System.out.println("0. Exit");
+            System.out.print("Choose: ");
+
+            int mainChoice = input.nextInt();
+
+            if (mainChoice == 0) {
+                System.out.println("Exit...");
+                break;
+            }
+
+            if (mainChoice == 2) {
+                showTotal();
+                continue;
+            }
+
+            if (mainChoice == 1) {
+                foodMenu();
+            }
+        }
+    }
+
+    static void foodMenu() {
+
+        menuLoop:
+        while (true) {
+            System.out.println("====== FOOD MENU ======");
+            System.out.println("1. Pizza");
+            System.out.println("2. Burger");
+            System.out.println("3. Drinks");
+            System.out.println("4. Seafood");
+            System.out.println("5. Grill");
+            System.out.println("6. Appetizers");
+            System.out.println("7. Special Dishes");
+            System.out.println("0. Back");
+            System.out.print("Choose: ");
+
+            int choice = input.nextInt();
+            if (choice == 0) return;
+
+            String[] categoryNames = {"Pizza","Burger","Drink","Seafood","Grill","Appetizer","Special Dish"};
+
+            String[][] items = {
+                {"Shawarma Pizza - 900","Cheese Pizza - 650","Chicken Pizza - 800","Tuna Pizza - 850","Margarita - 600","Mushroom - 750","Mix Pizza - 1000"},
+                {"Cheese Burger - 500","Chicken Burger - 450","Double Beef - 800","Fish Burger - 550","Spicy Burger - 500","BBQ Burger - 600","Special Burger - 750"},
+                {"Cola - 120","Juice - 200","Water - 50","Ice Tea - 150","Milkshake - 300","Coffee - 120","Tea - 60"},
+                {"Fish Plate - 1200","Shrimp - 1800","Calamari - 1600","Seafood Soup - 900","Fried Fish - 1400","Grilled Shrimp - 2000","Mixed Seafood - 2200"},
+                {"Chicken Grill - 900","Beef Grill - 1500","Kebab - 800","Kofta - 850","Ribs - 1600","Lamb - 1800","Mixed Grill - 2000"},
+                {"Fries - 250","Salad - 200","Soup - 250","Hummus - 200","Garlic Bread - 350","Onion Rings - 400","Cheese Sticks - 500"},
+                {"Pasta - 600","Lasagna - 800","Steak - 2000","Chicken Alfredo - 900","Shawarma Plate - 700","Taco Plate - 650","Sushi Set - 1500"}
+            };
+
+            int[][] prices = {
+                {900,650,800,850,600,750,1000},
+                {500,450,800,550,500,600,750},
+                {120,200,50,150,300,120,60},
+                {1200,1800,1600,900,1400,2000,2200},
+                {900,1500,800,850,1600,1800,2000},
+                {250,200,250,200,350,400,500},
+                {600,800,2000,900,700,650,1500}
+            };
+
+            System.out.println("---- " + categoryNames[choice-1] + " Menu ----");
+            for(int i=0;i<7;i++) System.out.println((i+1)+". "+items[choice-1][i]);
+            System.out.print("Choose item: ");
+            int itemChoice = input.nextInt();
+
+            String item = items[choice-1][itemChoice-1];
+            int price = prices[choice-1][itemChoice-1];
+
+            System.out.print("Enter quantity: ");
+            int qty = input.nextInt();
+
+            order.put(item, order.getOrDefault(item,0) + qty);
+            System.out.println("✅ Added: " + item + " x" + qty);
+
+            System.out.println("99. Edit Order | 1. Continue | 0. Back");
+            System.out.print("Choose: ");
+            int action = input.nextInt();
+
+            if (action == 99) {
+                editOrder();
+            } else if (action == 0) {
+                continue menuLoop;
+            }
+
+            extras();
+        }
+    }
+
+    static void extras() {
+        System.out.println("---- Extras ----");
+        System.out.println("1. Extra Cheese - 200");
+        System.out.println("2. Sauce - 100");
+        System.out.println("3. Fries - 250");
+        System.out.println("0. No Extra");
+        System.out.println("100. Show Total");
+        System.out.print("Choose: ");
+
+        int ex = input.nextInt();
+        int[] extraPrices = {200,100,250};
+
+        if (ex >=1 && ex <=3) {
+            order.put("Extra", order.getOrDefault("Extra",0) + extraPrices[ex-1]);
+        }
+        if (ex == 100) showTotal();
+    }
+
+    static void editOrder() {
+        if(order.isEmpty()){
+            System.out.println("Order is empty!");
+            return;
+        }
+
+        System.out.println("===== Edit Order =====");
+        int i = 1;
+        List<String> keys = new ArrayList<>(order.keySet());
+        for(String s: keys) {
+            System.out.println(i+". "+s+" x"+order.get(s));
+            i++;
+        }
+
+        System.out.print("Select item to edit: ");
+        int ch = input.nextInt();
+
+        String item = keys.get(ch-1);
+        System.out.println("1. Change quantity");
+        System.out.println("2. Remove item");
+        int act = input.nextInt();
+
+        if (act == 1) {
+            System.out.print("Enter new quantity: ");
+            int q = input.nextInt();
+            if (q <= 0) order.remove(item);
+            else order.put(item, q);
+        } else if (act == 2) {
+            order.remove(item);
+        }
+
+        System.out.println("✅ Order updated!");
+    }
+
+    static void showTotal() {
+        int total = 0;
+        for(String s : order.keySet()) {
+            String[] parts = s.split(" - ");
+            int price = Integer.parseInt(parts[1]);
+            total += price * order.get(s);
+        }
+
+        System.out.println("===== Your Order =====");
+        for(String s : order.keySet())
+            System.out.println(s+" x"+order.get(s));
+
+        System.out.println("Total = "+total+" DA");
+    }
+}
+
 
