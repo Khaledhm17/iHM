@@ -3,7 +3,8 @@ import java.util.*;
 public class RestaurantMenu {
 
     static Scanner input = new Scanner(System.in);
-    static Map<String, Integer> order = new LinkedHashMap<>();
+    static int total = 0;
+    static int extra = 0;
 
     public static void main(String[] args) {
 
@@ -13,7 +14,6 @@ public class RestaurantMenu {
             System.out.println("2. Show Total");
             System.out.println("0. Exit");
             System.out.print("Choose: ");
-
             int mainChoice = input.nextInt();
 
             if (mainChoice == 0) {
@@ -22,7 +22,7 @@ public class RestaurantMenu {
             }
 
             if (mainChoice == 2) {
-                showTotal();
+                System.out.println("Total = " + (total + extra) + " DA\n");
                 continue;
             }
 
@@ -36,7 +36,7 @@ public class RestaurantMenu {
 
         menuLoop:
         while (true) {
-            System.out.println("====== FOOD MENU ======");
+            System.out.println("\n====== FOOD MENU ======");
             System.out.println("1. Pizza");
             System.out.println("2. Burger");
             System.out.println("3. Drinks");
@@ -48,124 +48,133 @@ public class RestaurantMenu {
             System.out.print("Choose: ");
 
             int choice = input.nextInt();
-            if (choice == 0) return;
+            if (choice == 0) break;
 
-            String[] categoryNames = {"Pizza","Burger","Drink","Seafood","Grill","Appetizer","Special Dish"};
+            int price = 0;
 
-            String[][] items = {
-                {"Shawarma Pizza - 900","Cheese Pizza - 650","Chicken Pizza - 800","Tuna Pizza - 850","Margarita - 600","Mushroom - 750","Mix Pizza - 1000"},
-                {"Cheese Burger - 500","Chicken Burger - 450","Double Beef - 800","Fish Burger - 550","Spicy Burger - 500","BBQ Burger - 600","Special Burger - 750"},
-                {"Cola - 120","Juice - 200","Water - 50","Ice Tea - 150","Milkshake - 300","Coffee - 120","Tea - 60"},
-                {"Fish Plate - 1200","Shrimp - 1800","Calamari - 1600","Seafood Soup - 900","Fried Fish - 1400","Grilled Shrimp - 2000","Mixed Seafood - 2200"},
-                {"Chicken Grill - 900","Beef Grill - 1500","Kebab - 800","Kofta - 850","Ribs - 1600","Lamb - 1800","Mixed Grill - 2000"},
-                {"Fries - 250","Salad - 200","Soup - 250","Hummus - 200","Garlic Bread - 350","Onion Rings - 400","Cheese Sticks - 500"},
-                {"Pasta - 600","Lasagna - 800","Steak - 2000","Chicken Alfredo - 900","Shawarma Plate - 700","Taco Plate - 650","Sushi Set - 1500"}
-            };
+            switch (choice) {
+                case 1:
+                    price = selectItem("Pizza",
+                            new String[]{"Shawarma Pizza", "Cheese Pizza", "Chicken Pizza", "Tuna Pizza", "Margarita", "Mushroom", "Mix Pizza"},
+                            new int[]{900, 650, 800, 850, 600, 750, 1000});
+                    break;
 
-            int[][] prices = {
-                {900,650,800,850,600,750,1000},
-                {500,450,800,550,500,600,750},
-                {120,200,50,150,300,120,60},
-                {1200,1800,1600,900,1400,2000,2200},
-                {900,1500,800,850,1600,1800,2000},
-                {250,200,250,200,350,400,500},
-                {600,800,2000,900,700,650,1500}
-            };
+                case 2:
+                    price = selectItem("Burger",
+                            new String[]{"Cheese Burger", "Chicken Burger", "Double Beef", "Fish Burger", "Spicy", "BBQ", "Special Burger"},
+                            new int[]{500, 450, 800, 550, 500, 600, 750});
+                    break;
 
-            System.out.println("---- " + categoryNames[choice-1] + " Menu ----");
-            for(int i=0;i<7;i++) System.out.println((i+1)+". "+items[choice-1][i]);
-            System.out.print("Choose item: ");
-            int itemChoice = input.nextInt();
+                case 3:
+                    price = selectItem("Drinks",
+                            new String[]{"Cola", "Juice", "Water", "Ice Tea", "Milkshake", "Coffee", "Tea"},
+                            new int[]{120, 200, 50, 150, 300, 120, 60});
+                    break;
 
-            String item = items[choice-1][itemChoice-1];
-            int price = prices[choice-1][itemChoice-1];
+                case 4:
+                    price = selectItem("Seafood",
+                            new String[]{"Fish Plate", "Shrimp", "Calamari", "Seafood Soup", "Fried Fish", "Grilled Shrimp", "Mixed Seafood"},
+                            new int[]{1200, 1800, 1600, 900, 1400, 2000, 2200});
+                    break;
 
-            System.out.print("Enter quantity: ");
-            int qty = input.nextInt();
+                case 5:
+                    price = selectItem("Grill",
+                            new String[]{"Chicken Grill", "Beef Grill", "Kebab", "Kofta", "Ribs", "Lamb Grill", "Mixed Grill"},
+                            new int[]{900, 1500, 800, 850, 1600, 1800, 2000});
+                    break;
 
-            order.put(item, order.getOrDefault(item,0) + qty);
-            System.out.println("✅ Added: " + item + " x" + qty);
+                case 6:
+                    price = selectItem("Appetizers",
+                            new String[]{"Fries", "Salad", "Soup", "Hummus", "Garlic Bread", "Onion Rings", "Cheese Sticks"},
+                            new int[]{250, 200, 250, 200, 350, 400, 500});
+                    break;
 
-            System.out.println("99. Edit Order | 1. Continue | 0. Back");
-            System.out.print("Choose: ");
-            int action = input.nextInt();
-
-            if (action == 99) {
-                editOrder();
-            } else if (action == 0) {
-                continue menuLoop;
+                case 7:
+                    price = selectItem("Special Dishes",
+                            new String[]{"Pasta", "Lasagna", "Steak", "Chicken Alfredo", "Shawarma Plate", "Taco Plate", "Sushi Set"},
+                            new int[]{600, 800, 2000, 900, 700, 650, 1500});
+                    break;
             }
 
-            extras();
+            if (price == -1) continue; // means user chose 0 to go back
+
+            total += price;
+            System.out.println("✅ Item Added");
+
+            // --- Extras ---
+            System.out.println("\n---- Extras ----");
+            System.out.println("1. Extra Cheese - 200 DA");
+            System.out.println("2. Sauce - 100 DA");
+            System.out.println("3. Fries - 250 DA");
+            System.out.println("0. No Extras");
+            System.out.print("Choose: ");
+
+            int ex = input.nextInt();
+            if (ex >= 1 && ex <= 3) {
+                int[] exArr = {200, 100, 250};
+                extra += exArr[ex - 1];
+            }
+
+            // After extras
+            System.out.println("\nChoose:");
+            System.out.println("1. Back to Food Menu");
+            System.out.println("99. Show Total");
+            System.out.println("0. Exit");
+            System.out.print("Choose: ");
+            int opt = input.nextInt();
+
+            if (opt == 0) {
+                System.out.println("Exit...");
+                System.exit(0);
+            } else if (opt == 99) {
+                System.out.println("\nTotal = " + (total + extra) + " DA\n");
+                System.out.println("Press any number to continue...");
+                input.nextInt();
+                continue;
+            } else if (opt == 1) {
+                continue;
+            }
         }
     }
 
-    static void extras() {
-        System.out.println("---- Extras ----");
-        System.out.println("1. Extra Cheese - 200");
-        System.out.println("2. Sauce - 100");
-        System.out.println("3. Fries - 250");
-        System.out.println("0. No Extra");
-        System.out.println("100. Show Total");
+    static int selectItem(String category, String[] names, int[] prices) {
+
+        System.out.println("\n---- " + category + " ----");
+        for (int i = 0; i < names.length; i++) {
+            System.out.println((i + 1) + ". " + names[i] + " - " + prices[i] + " DA");
+        }
+        System.out.println("0. Back");
         System.out.print("Choose: ");
 
-        int ex = input.nextInt();
-        int[] extraPrices = {200,100,250};
+        int c = input.nextInt();
+        if (c == 0) return -1;
 
-        if (ex >=1 && ex <=3) {
-            order.put("Extra", order.getOrDefault("Extra",0) + extraPrices[ex-1]);
-        }
-        if (ex == 100) showTotal();
-    }
+        int price = prices[c - 1];
 
-    static void editOrder() {
-        if(order.isEmpty()){
-            System.out.println("Order is empty!");
-            return;
-        }
+        System.out.print("Enter quantity: ");
+        int qty = input.nextInt();
 
-        System.out.println("===== Edit Order =====");
-        int i = 1;
-        List<String> keys = new ArrayList<>(order.keySet());
-        for(String s: keys) {
-            System.out.println(i+". "+s+" x"+order.get(s));
-            i++;
-        }
+        int itemCost = price * qty;
+        total += itemCost;
 
-        System.out.print("Select item to edit: ");
-        int ch = input.nextInt();
+        // Edit / Continue / Exit
+        System.out.println("\n99 = Edit Order");
+        System.out.println("1 = Continue");
+        System.out.println("0 = Back to Food Menu");
+        System.out.print("Choose: ");
 
-        String item = keys.get(ch-1);
-        System.out.println("1. Change quantity");
-        System.out.println("2. Remove item");
         int act = input.nextInt();
-
-        if (act == 1) {
-            System.out.print("Enter new quantity: ");
-            int q = input.nextInt();
-            if (q <= 0) order.remove(item);
-            else order.put(item, q);
-        } else if (act == 2) {
-            order.remove(item);
+        if (act == 99) {
+            total -= itemCost;
+            System.out.println("Order Edited...");
+            return -1;
+        }
+        if (act == 0) {
+            total -= itemCost;
+            System.out.println("Back to Menu...");
+            return -1;
         }
 
-        System.out.println("✅ Order updated!");
-    }
-
-    static void showTotal() {
-        int total = 0;
-        for(String s : order.keySet()) {
-            String[] parts = s.split(" - ");
-            int price = Integer.parseInt(parts[1]);
-            total += price * order.get(s);
-        }
-
-        System.out.println("===== Your Order =====");
-        for(String s : order.keySet())
-            System.out.println(s+" x"+order.get(s));
-
-        System.out.println("Total = "+total+" DA");
+        return itemCost;
     }
 }
-
-
